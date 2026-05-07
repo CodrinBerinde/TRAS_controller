@@ -36,7 +36,7 @@ end
 
 %simulation parameters
 stop_time = 10;
-sampling_time = 1e-3;
+sampling_time = 1e-2;
 samples = stop_time / sampling_time + 1;
 
 %inputs definitions
@@ -54,7 +54,7 @@ kp = 4;
 kd = 4;
 
 %%
-out = sim('TRAS_controller_.slx');
+out = sim('TRAS_closed_loop_.slx');
 simulation_results = out.data;
 alpha_v_ref_sim = rad2deg(simulation_results.Data(:, 1));
 alpha_h_ref_sim = rad2deg(simulation_results.Data(:, 2));
