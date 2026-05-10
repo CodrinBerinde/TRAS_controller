@@ -1,13 +1,13 @@
-%constants definitions
+%process parameters
 
-[Fv_of_u1, Fh_of_u2] = thrustForcesDependencies();
+[Fv_of_u1, Fh_of_u2, Fv, Fh, Tv, Th, Kv, Kh] = thrustForcesDependencies();
 [A, B, C, D, E, F, L, Jv, lm, lt] = momentsOfInertia();
 g = 9.81;
 
-x_grid = linspace(-1, 1, 1e5);
-y_grid_v = polyval(Fv_of_u1, x_grid);
+x_grid = linspace(-4000, 4000, 1e4);
+y_grid_v = polyval(Fv, x_grid);
 
-%we have to make Fv_of_u1 strictly increasing
+%we have to make Fv strictly increasing
 for i = length(y_grid_v) / 2:length(y_grid_v)
     if y_grid_v(i) <= y_grid_v(i - 1)
         y_grid_v(i) = y_grid_v(i-1) + 1e-15;
@@ -21,7 +21,7 @@ for i = length(y_grid_v) / 2:-1:1
 end
 
 %and exactly the same procedure for Fh
-y_grid_h = polyval(Fh_of_u2, x_grid);
+y_grid_h = polyval(Fh, x_grid);
 for i = length(y_grid_h) / 2:length(y_grid_h)
     if y_grid_h(i) <= y_grid_h(i - 1)
         y_grid_h(i) = y_grid_h(i-1) + 1e-15;
@@ -38,20 +38,42 @@ end
 stop_time = 10;
 sampling_time = 1e-2;
 samples = stop_time / sampling_time + 1;
+derivative_pole_tc = 2 * sampling_time; %the time constant of the pole of the filtered derivatives throughout the entire project
 
 %inputs definitions
 t = linspace(0, stop_time, samples);
 
-alpha_v_ref = deg2rad([20 * ones(1, 3000) 20 * ones(1, samples - 3000)]);
-alpha_h_ref = deg2rad(15*sin(2*pi*0.3*t));
-%alpha_h_ref = deg2rad(zeros(1, samples));
+%alpha_h_ref = deg2rad([20 * ones(1, round(0.3 * samples)) -20 * ones(1, samples - round(0.3 * samples))]);
+alpha_v_ref = deg2rad(15*sin(2*pi*0.3*t));
+%alpha_h_ref = deg2rad(15*sin(2*pi*0.5*t+0.2));
+%alpha_v_ref = deg2rad([20 * ones(1, round(0.6 * samples)) -20 * ones(1, samples - round(0.6 * samples))]);
+alpha_h_ref = zeros(1, samples);
+%alpha_v_ref = zeros(1, samples);
 
-alpha_v_ref_to_simulink = timeseries(alpha_v_ref, t);
-alpha_h_ref_to_simulink = timeseries(alpha_h_ref, t);
+
+alpha_v_ref_timeseries = timeseries(alpha_v_ref, t);
+alpha_h_ref_timeseries = timeseries(alpha_h_ref, t);
 
 %controller parameters
-kp = 4;
-kd = 4;
+
+%the characteristic equation of the error is
+% (s + pole) * (s^2 + 2*zeta*wn*s + wn^2) = 0
+%a real negative pole was chosen, and a pair of complex conjugates
+zeta = 1.35;
+tr = 1; %settling time
+wn = 4 / zeta / tr; %natural oscillations frequency
+pole = 0.3 * wn; %big enough (in absolute value s.t. it does not dictate the dynamics)
+
+kd = 2 * zeta * wn + pole;
+kp = wn^2 + 2 * zeta * wn * pole;
+ki = pole * wn^2;
+
+%inner controller parameters
+zeta_inner = 0.62;
+tr_inner = 0.15;
+wn_inner = 4 / zeta_inner / tr_inner;
+ki_inner = wn_inner^2;
+kp_inner = 2 * zeta_inner * wn_inner;
 
 %%
 out = sim('TRAS_closed_loop_.slx');

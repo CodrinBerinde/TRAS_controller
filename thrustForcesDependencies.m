@@ -1,4 +1,4 @@
-function [Fv_of_u1, Fh_of_u2] = thrustForcesDependencies()
+function [Fv_of_u1, Fh_of_u2, Fv, Fh, Tv, Th, Kv, Kh] = thrustForcesDependencies()
 %THRUSTFORCESDEPENDENCIES computation of the thrust force dependency on the input voltage
 %   the input voltage is not in volts, but it is a coefficient between -1
 %   and 1
@@ -37,5 +37,13 @@ for i = length(Fh):-1:1
         wh_power = conv(wh_power, wh);
     end
 end
+Tpeak = 0.1;
+Tdecline = 0.05;
+Kpeak = 6000;
+Kdecline = 3500;
+Tv = [-Tdecline / 4000^2, 0, Tpeak];
+Th = [-Tdecline / 4000^2, 0, Tpeak];
+Kv = [-Kdecline / 4000^2, 0, Kpeak];
+Kh = [-Kdecline / 4000^2, 0, Kpeak];
 
 end

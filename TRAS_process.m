@@ -1,21 +1,21 @@
 % constants definitions
 
-[Fv_of_u1, Fh_of_u2] = thrustForcesDependencies();
+[Fv_of_u1, Fh_of_u2, Fv, Fh, Tv, Th, Kv, Kh] = thrustForcesDependencies();
 [A, B, C, D, E, F, L, Jv, lm, lt] = momentsOfInertia();
 g = 9.81;
 
 %simulation parameters
 stop_time = 10;
-sampling_time = 1e-3;
+sampling_time = 1e-2;
 samples = stop_time / sampling_time + 1;
 
 %inputs definitions
-u1 = 0.45 * ones(1, samples);
-u2 = zeros(1, samples);
+uv = 0.25 * ones(1, samples);
+uh = zeros(1, samples);
 
 t = linspace(0, stop_time, samples);
-u1_to_simulink = timeseries(u1, t);
-u2_to_simulink = timeseries(u2, t);
+uv_timeseries = timeseries(uv, t);
+uh_timeseries = timeseries(uh, t);
 %%
 out = sim('TRAS_process_.slx');
 simulation_results = out.data;
