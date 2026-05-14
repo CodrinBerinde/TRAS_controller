@@ -1,6 +1,6 @@
 % constants definitions
 
-[Fv_of_u1, Fh_of_u2, Fv, Fh, Tv, Th, Kv, Kh] = thrustForcesDependencies();
+[Fv, Fh, Fv_omega_grid, Fv_force_grid, Fh_omega_grid, Fh_force_grid, Thetav, Thetah] = thrustForcesDependencies();
 [A, B, C, D, E, F, L, Jv, lm, lt] = momentsOfInertia();
 g = 9.81;
 
