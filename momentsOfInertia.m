@@ -26,4 +26,10 @@ E = mcb * lcb^2 + mb * lb^2 / 3;
 F = mms * rms^2 + mts * rts^2;
 L = (mmr + mms + mm / 4) * lm^2 + (mtr + mts + mt / 4) * lt^2 - mcb * lcb^2 - mb / 4 * lb^2;
 Jv = D + E + F;
+
+%rezultate in urma identificarii facute de Petru
+%nu conteaza cat e A si cat e B, doar diferenta lor intervine
+A = 0.0552;
+B = 0.0599;
+C = 0.0084;
 end
